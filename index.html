@@ -82,11 +82,11 @@
     var act = st.vals && st.vals.active, me = seat;
     var who = me === 'p1' ? 'You: Player 1' : me === 'p2' ? 'You: Player 2' : me === 'solo' ? 'Solo' : 'Pick a seat';
     var turn = act ? (me && act === me ? ' · YOUR TURN' : ' · ' + (act === 'p1' ? 'Player 1' : 'Player 2') + "'s turn") : '';
-    var full = who + turn + ' · ' + st.status + ' · build B12';
+    var full = who + turn + ' · ' + st.status + ' · build B13';
     if (st.status === 'connected') {
       var n = document.querySelector('[data-cc-code]'); if (n) n.remove();
       if (st.fullAt !== full) { st.fullAt = full; clearTimeout(st.fullT); st.fullT = setTimeout(function () { st.compact = true; render(); }, 4000); st.compact = false; }
-      banner.textContent = st.compact ? ((me && act === me ? '\u25CF YOUR TURN' : '\u25CB waiting') + ' · B12') : full;
+      banner.textContent = st.compact ? ((me && act === me ? '\u25CF YOUR TURN' : '\u25CB waiting') + ' · B13') : full;
     } else { st.fullAt = null; st.compact = false; banner.textContent = full; }
     banner.style.background = (me && act === me) ? '#14532d' : '#111';
   }
@@ -13387,6 +13387,7 @@ function v7bk(w, i, cap) {
 function v7tb(lane, w) {
   let all = lane.items || [], rest = all.filter((v) => v.id !== w.id);
   if (!all.some((v) => v.id === w.id) || lane.isBanked || !w.playedThisTurn) return { ok: !1 };
+  if (lane.laneType === "set" && all[all.length - 1].id !== w.id) return { ok: !1 };
   if (rest.length < 3)
     return all.every((v) => v.playedThisTurn) ? { ok: !0, pullAll: !0, rest: [] } : { ok: !1 };
   let isW = (v) => v.source === "wild_2" || v.source === "joker",
