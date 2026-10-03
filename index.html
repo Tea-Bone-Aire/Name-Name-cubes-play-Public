@@ -82,7 +82,7 @@
     var act = st.vals && st.vals.active, me = seat;
     var who = me === 'p1' ? 'You: Player 1' : me === 'p2' ? 'You: Player 2' : me === 'solo' ? 'Solo' : 'Pick a seat';
     var turn = act ? (me && act === me ? ' · YOUR TURN' : ' · ' + (act === 'p1' ? 'Player 1' : 'Player 2') + "'s turn") : '';
-    banner.textContent = who + turn + ' · ' + st.status + ' · build B5';
+    banner.textContent = who + turn + ' · ' + st.status + ' · build B6';
     banner.style.background = (me && act === me) ? '#14532d' : '#111';
   }
   function showPicker() {
@@ -13372,6 +13372,13 @@ function x6(Y, A, X, Z = "primary", U) {
     formulaDescription: N,
   };
 }
+function v7bk(w, i, cap) {
+  let it = w.items || [], f = it.find((c) => !(c.isWild2 || c.isJoker) && c.numericValue != null);
+  if (!f) return i + 1;
+  if (w.laneType === "set") return f.numericValue;
+  let v = f.numericValue + (i - it.indexOf(f));
+  return v >= 1 && v <= cap ? v : "\u2013";
+}
 function P6(Y) {
   if (Y.length === 0)
     return { composition: "clean", reason: "Empty lane", violations: [] };
@@ -13397,7 +13404,7 @@ function P6(Y) {
     return {
       composition: "dirty",
       reason:
-        "Regular Dirty: Contains a Fate of Fortuna Joker in a mixed lane (Section 8: Jokers are definitionally incompatible with Full Dirty alternating requirement).",
+        "Regular Dirty: Contains a Fate of Fortuna Joker in a mixed lane (Jokers can never be part of a Full Dirty lane).",
       violations: [],
     };
   let z = Y[0],
@@ -14697,7 +14704,7 @@ B("div", {
                             children: Array.from({ length: 11 }).map((R0, oY) => {
                               let qY = w.items[oY];
                               if (!qY)
-                                return B("div", { className: "h-full rounded-lg border-2 border-dashed border-white/30 bg-black/30 flex items-center justify-center text-neutral-300 font-mono text-sm", children: oY + 1 }, oY);
+                                return B("div", { className: "h-full rounded-lg border-2 border-dashed border-white/30 bg-black/30 flex items-center justify-center text-neutral-300 font-mono text-sm", children: v7bk(w, oY, 13) }, oY);
                               let UJ =
                                 !!qY.playedThisTurn && O === "action"
                                   ? B("button", {
@@ -14794,7 +14801,7 @@ B("div", {
                                           : B("span", {
                                               className:
                                                 "text-[9px] font-mono text-neutral-600",
-                                              children: h + 1,
+                                              children: v7bk(w, h, 6),
                                             }),
                                       },
                                       h,
