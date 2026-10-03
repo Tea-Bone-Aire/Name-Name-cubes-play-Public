@@ -23,6 +23,7 @@
   }
   function schedule() { clearTimeout(st.timer); st.timer = setTimeout(flush, 80); }
   function applyRemote(d) {
+    window.__v7dt = false;
     var s = d.state || {};
     KEYS.forEach(function (k) { if (k in s && st.setters && st.setters[k]) st.setters[k](s[k]); });
     st.lastSig = JSON.stringify(KEYS.map(function (k) { return k in s ? s[k] : null; }));
@@ -148,7 +149,6 @@
   };
 })();
 </script>
-
 <style type="text/tailwindcss">
 @theme {
   --breakpoint-sm: 0px;
@@ -12991,6 +12991,7 @@ function zq(Y, A) {
   if (U) return { isBust: !0, canSkullyReroll: !0, skullyDie: U };
   return { isBust: !0, canSkullyReroll: !1 };
 }
+function v7w(c) { return !!(c.isWild2 || c.isJoker); }
 function Gq(Y, A, X) {
   if (X.isBanked) return { allowed: !1, reason: "Lane is already banked." };
   let Z = Y.length + A.length;
@@ -13000,7 +13001,7 @@ function Gq(Y, A, X) {
       reason: "Must select at least 3 items to open a lane.",
     };
   if (X.laneCategory === "primary" && X.color) {
-    if (Y.find((H) => H.color !== X.color))
+    if (Y.find((H) => H.color !== X.color && !v7w(H)))
       return {
         allowed: !1,
         reason: `All cards must match lane color (${X.color.toUpperCase()}).`,
@@ -13011,7 +13012,7 @@ function Gq(Y, A, X) {
   let U = [];
   if (
     (Y.forEach((J) => {
-      if (!J.isWild2) U.push(J.rank);
+      if (!v7w(J)) U.push(J.rank);
     }),
     A.forEach((J) => U.push(J.value)),
     X.items
@@ -13031,7 +13032,7 @@ function Gq(Y, A, X) {
       allowed: !0,
       laneType: "set",
       slotAssignments: [
-        ...Y.map((Q) => ({ refId: Q.id, rank: Q.isWild2 ? J : Q.rank })),
+        ...Y.map((Q) => ({ refId: Q.id, rank: v7w(Q) ? J : Q.rank })),
         ...A.map((Q) => ({ refId: Q.id, rank: Q.value })),
       ],
     };
@@ -13086,12 +13087,12 @@ function Gq(Y, A, X) {
         };
       let V = [];
       (Y.forEach((D) => {
-        if (!D.isWild2) V.push({ refId: D.id, rank: D.rank });
+        if (!v7w(D)) V.push({ refId: D.id, rank: D.rank });
       }),
         A.forEach((D) => {
           V.push({ refId: D.id, rank: D.value });
         }));
-      let C = Y.filter((D) => D.isWild2),
+      let C = Y.filter((D) => v7w(D)),
         E = new Set(N);
       for (let D = $; D <= b && C.length > 0; D++)
         if (!E.has(D)) {
@@ -13136,13 +13137,13 @@ function Jq(Y, A) {
       allowed: !1,
       reason: "Primary lane has reached the hard cap of 11 items.",
     };
-  if (A.color && Y.color !== A.color)
+  if (A.color && Y.color !== A.color && !v7w(Y))
     return {
       allowed: !1,
       reason: `This lane is ${A.color.toUpperCase()} only. Card is ${Y.color.toUpperCase()}.`,
     };
   if (A.items.length === 0)
-    return { allowed: !0, targetRank: Y.isWild2 ? void 0 : Y.rank };
+    return { allowed: !0, targetRank: v7w(Y) ? void 0 : Y.rank };
   let X = A.items.filter((H) => H.source !== "wild_2");
   if (
     A.laneType === "set" ||
@@ -13151,7 +13152,7 @@ function Jq(Y, A) {
       X.every((H) => H.numericValue === X[0].numericValue)) ||
     A.laneType === "set"
   ) {
-    if (Y.isWild2) return { allowed: !0 };
+    if (v7w(Y)) return { allowed: !0 };
     let H = X.length > 0 ? X[0].numericValue : null;
     if (H === null || Y.rank === H)
       return { allowed: !0, targetRank: H || Y.rank };
@@ -13160,7 +13161,7 @@ function Jq(Y, A) {
       reason: `Lane is a Set of ${KY(H)}s. Card is ${Y.label}.`,
     };
   }
-  if (new Set(A.items.map((H) => H.numericValue)).has(Y.rank) && !Y.isWild2)
+  if (new Set(A.items.map((H) => H.numericValue)).has(Y.rank) && !v7w(Y))
     return {
       allowed: !1,
       reason: `Rank ${Y.label} is already present in this sequence.`,
@@ -13168,7 +13169,7 @@ function Jq(Y, A) {
   let z = A.items.map((H) => H.numericValue).sort((H, Q) => H - Q),
     G = z[0],
     J = z[z.length - 1];
-  if (Y.isWild2) return { allowed: !0 };
+  if (v7w(Y)) return { allowed: !0 };
   if (Y.rank === G - 1 || Y.rank === J + 1 || (Y.rank > G && Y.rank < J))
     return { allowed: !0, targetRank: Y.rank };
   return {
@@ -13811,21 +13812,25 @@ function fq({ onSwitchView: Y } = {}) {
         return { ...K, [G]: { ...x, hand: T } };
       });
     },
-    Iq = () => {
-      if (O !== "draw" && O !== "roll") return;
+    Iq = (v7want) => {
+      if (O !== "draw") return;
+      let v7n = Math.min(v7want || 1, 7 - H0.hand.length);
+      if (v7n <= 0) { L("roll"); return; }
       let w = [...X];
-      if (w.length < 2) w = [...w, ...b6()];
-      let K = w.slice(0, 2),
-        x = w.slice(2);
+      if (w.length < v7n) w = [...w, ...b6()];
+      let K = w.slice(0, v7n),
+        x = w.slice(v7n);
       (Z(x),
         W((T) => ({ ...T, [G]: { ...T[G], hand: [...T[G].hand, ...K] } })),
-        c(
-          `Drew 2 cards: ${K.map((T) => `${T.label}${MY[T.suit]}`).join(", ")}.`,
-        ),
-        L("roll"));
+        c(`Drew ${v7n} card(s): ${K.map((T) => `${T.label}${MY[T.suit]}`).join(", ")}.`),
+        H0.hand.length + v7n >= 7 && L("roll"));
     },
     Sq = () => {
       if (U.length === 0) return;
+      if (O !== "draw") { c("Draw from the discard only in the draw step."); return; }
+      if (H0.hand.length >= 7) { c("Hand is full (7). Cannot draw."); return; }
+      if (window.__v7dt) { c("Only one discard card per draw."); return; }
+      window.__v7dt = !0;
       let w = U[0];
       if (!cG(w)) {
         c(
@@ -13835,7 +13840,8 @@ function fq({ onSwitchView: Y } = {}) {
       }
       (z((K) => K.slice(1)),
         W((K) => ({ ...K, [G]: { ...K[G], hand: [...K[G].hand, w] } })),
-        c(`Took top discard: ${w.label}${MY[w.suit]}.`));
+        c(`Took top discard: ${w.label}${MY[w.suit]}.`),
+        H0.hand.length + 1 >= 7 && L("roll"));
     },
     bq = () => {
       if (O !== "roll") return;
@@ -13851,6 +13857,22 @@ function fq({ onSwitchView: Y } = {}) {
           "\uD83D\uDCA5 TRUE BUST! Zero scoring dice or valid placements. Action phase locked. Must discard 1 card to pass turn.",
         ),
           L("discard"));
+    },
+    v7rr = () => {
+      if (O !== "action") return;
+      let hold = KA.filter((d) => !d.used && iY.includes(d.id)),
+        rest = KA.filter((d) => !d.used && !iY.includes(d.id));
+      if (rest.length === 0) { c("⚠️ No dice to roll. Deselect the dice you want to re-roll."); return; }
+      if (hold.length === 0) { c("⚠️ Hold (tap) at least one die first. Held dice stay; the rest re-roll."); return; }
+      let nv = new Map(rest.map((d) => [d.id, Math.floor(Math.random() * 6) + 1])),
+        nk = KA.map((d) => (nv.has(d.id) ? { ...d, value: nv.get(d.id), isSkully: !1, rerolled: !0 } : d));
+      pY(nk);
+      c(`Re-rolled ${rest.length} die: [${rest.map((d) => nv.get(d.id)).join(", ")}], held [${hold.map((d) => d.value).join(", ")}].`);
+      let rolled = nk.filter((d) => nv.has(d.id));
+      if (zq(rolled, H0.lanes).isBust) {
+        c("💥 BUST on the re-roll! Held dice are lost. Discard 1 card to pass turn.");
+        L("discard");
+      }
     },
     xq = (w) => {
       if (O !== "action") return;
@@ -13993,9 +14015,33 @@ function fq({ onSwitchView: Y } = {}) {
           I.set(S.id, S.value);
         }
       }
+      if (K.items.length > 0) {
+        let vw = x.filter((S) => v7w(S) && !I.has(S.id));
+        if (vw.length) {
+          let vn = K.items.filter((S) => S.source !== "wild_2").map((S) => S.numericValue);
+          x.filter((S) => !v7w(S)).forEach((S) => vn.push(I.get(S.id) ?? S.rank));
+          T.forEach((S) => vn.push(S.value));
+          let vset = j === "set" || K.laneType === "set",
+            vocc = new Set(K.items.map((S) => S.numericValue));
+          x.forEach((S) => { if (I.has(S.id)) vocc.add(I.get(S.id)); });
+          T.forEach((S) => vocc.add(S.value));
+          for (let S of vw) {
+            let r;
+            if (vset) r = vn[0] ?? 3;
+            else {
+              let lo = Math.min(...vocc), hi = Math.max(...vocc);
+              for (let q = lo; q <= hi; q++) if (!vocc.has(q)) { r = q; break; }
+              if (r === void 0) r = hi + 1 <= 13 ? hi + 1 : lo - 1 >= 3 ? lo - 1 : void 0;
+              if (r === void 0) { c("❌ Wild 2 has no free rank in this sequence."); return; }
+              vocc.add(r);
+            }
+            I.set(S.id, r);
+          }
+        }
+      }
       let X0 = [
           ...x.map((S) => {
-            let v = I.get(S.id) ?? (S.isWild2 ? 3 : S.rank);
+            let v = I.get(S.id) ?? (v7w(S) ? 3 : S.rank);
             return {
               id: `item_${Math.random().toString(36).substring(2, 7)}`,
               source: S.isWild2 ? "wild_2" : S.isJoker ? "joker" : "card",
@@ -14232,17 +14278,17 @@ function fq({ onSwitchView: Y } = {}) {
             `\uD83C\uDF1F ${H0.name} reached ${y0.toLocaleString()} points (10,000 threshold)! Opponent gets one final turn!`,
           ));
     },
-    yq = (w) => {
+    yq = (w, v7ex = []) => {
       if (
-        (z((T) => [w, ...T]),
+        (z((T) => [w, ...v7ex, ...T]),
         W((T) => {
           let j = T[G];
           return {
             ...T,
-            [G]: { ...j, hand: j.hand.filter((I) => I.id !== w.id) },
+            [G]: { ...j, hand: j.hand.filter((I) => I.id !== w.id && !v7ex.some((e) => e.id === I.id)) },
           };
         }),
-        c(`Discarded ${w.label}${MY[w.suit]} to close turn.`),
+        c(`Discarded ${w.label}${MY[w.suit]}${v7ex.length ? " +" + v7ex.length + " more" : ""} to close turn.`),
         tZ(null),
         lX([]),
         DA([]),
@@ -14266,17 +14312,9 @@ function fq({ onSwitchView: Y } = {}) {
             `⚠️ FINAL TURN INITIATED: ${DY.name} has one final turn to top ${H0.bankedScore.toLocaleString()} points!`,
           ));
       (J(sA), Q((T) => T + 1));
-      let K = Math.max(0, 7 - DY.hand.length),
-        x = [...X];
-      if (K > 0) {
-        if (x.length < K) x = [...x, ...b6()];
-        let T = x.slice(0, K),
-          j = x.slice(K);
-        (Z(j),
-          W((I) => ({ ...I, [sA]: { ...I[sA], hand: [...I[sA].hand, ...T] } })),
-          c(`${DY.name} drew ${T.length} cards (hand restored to 7).`));
-      }
-      L("roll");
+      window.__v7dt = !1;
+      c(`${DY.name}: draw up to 7 (deck or one discard).`);
+      L(DY.hand.length < 7 ? "draw" : "roll");
     },
     ZJ = () => {
       let w = Vq();
@@ -14338,7 +14376,7 @@ function fq({ onSwitchView: Y } = {}) {
         ? B(
             "div",
             {
-              className: `flex-none recessed-die-well rounded-lg flex items-center justify-center ${sm ? "h-7 w-8" : "h-9 w-10"} ${i > 0 ? "-ml-3" : ""}`,
+              className: `flex-none recessed-die-well rounded-lg flex items-center justify-center relative z-0 ${sm ? "h-7 w-8" : "h-9 w-10"} ${i > 0 ? "-ml-3" : ""}`,
               title: `Die ${it.numericValue}`,
               children: B(nZ, { value: it.numericValue, isSkully: it.isSkully, size: "sm", className: sm ? "w-5! h-5!" : "" }),
             },
@@ -14347,7 +14385,7 @@ function fq({ onSwitchView: Y } = {}) {
         : R(
             "div",
             {
-              className: `flex-none flex rounded-md border-2 font-black leading-none shadow-[-3px_0_0_rgba(0,0,0,0.55)] ${sm ? "h-7 w-10 text-sm flex-row items-center gap-0.5 pl-1" : "h-9 w-11 text-base flex-col items-start pl-1 pt-0.5"} ${i > 0 ? (sm ? "-ml-5" : "-ml-[18px]") : ""} ${v7FaceCls(it)}`,
+              className: `relative z-10 flex-none flex rounded-md border-2 font-black leading-none shadow-[-3px_0_0_rgba(0,0,0,0.55)] ${sm ? "h-7 w-10 text-sm flex-row items-center gap-0.5 pl-1" : "h-9 w-11 text-base flex-col items-start pl-1 pt-0.5"} ${i > 0 ? (sm ? "-ml-5" : "-ml-[18px]") : ""} ${v7FaceCls(it)}`,
               children: [B("span", { children: v7RankOf(it) }), B("span", { className: sm ? "text-xs" : "text-sm", children: v7SuitOf(it) })],
             },
             it.id,
@@ -14688,7 +14726,7 @@ B("div", {
                           "div",
                           {
                             onClick: () => {
-                              (aG(w.id), tZ((R0) => (R0 === w.id ? null : w.id)));
+                              aG(w.id);
                             },
                             onMouseEnter: () => u6 && nG(w.id),
                             onMouseLeave: () => u6 && nG(null),
@@ -14805,9 +14843,10 @@ R("footer", {
                 className: "h-[18px] flex items-center justify-between text-xs text-neutral-200 px-0.5",
                 children: [
                   R("span", { className: "font-mono", children: ["Deck ", X.length] }),
-                  O === "draw" && B("button", { onClick: Iq, className: "px-2 h-[18px] rounded bg-amber-500 text-black font-bold text-xs cursor-pointer", children: "Draw 2" }),
+                  O === "draw" && H0.hand.length < 7 && B("button", { onClick: () => Iq(1), className: "px-2 h-[18px] rounded bg-amber-500 text-black font-bold text-xs cursor-pointer", children: "Draw" }),
+                  O === "draw" && H0.hand.length < 6 && B("button", { onClick: () => Iq(7), className: "px-2 h-[18px] rounded bg-amber-500 text-black font-bold text-xs cursor-pointer", children: "Fill 7" }),
                   R("span", { className: "font-mono", children: ["Discard ", U.length] }),
-                  U.length > 0 && cG(U[0]) && R("button", { onClick: Sq, title: `Take ${U[0].label}${MY[U[0].suit]}`, className: "px-2 h-[18px] rounded bg-neutral-800 text-amber-300 font-bold text-xs border border-amber-400/50 cursor-pointer", children: ["Take ", U[0].label] }),
+                  O === "draw" && H0.hand.length < 7 && U.length > 0 && cG(U[0]) && R("button", { onClick: Sq, title: `Take ${U[0].label}${MY[U[0].suit]}`, className: "px-2 h-[18px] rounded bg-neutral-800 text-amber-300 font-bold text-xs border border-amber-400/50 cursor-pointer", children: ["Take ", U[0].label] }),
                 ],
               }),
               KA.length === 0
@@ -14849,15 +14888,17 @@ R("footer", {
               }),
               R("button", {
                 onClick: () => {
-                  if (lY.length !== 1) {
-                    c("⚠️ Select exactly 1 card from hand to discard and end turn.");
+                  let v7nd = O === "discard" ? 0 : KA.filter((d) => !d.used).length,
+                    v7need = Math.min(1 + v7nd, H0.hand.length);
+                  if (lY.length !== v7need) {
+                    c(`⚠️ Select exactly ${v7need} card(s) to discard and end turn (1 + ${v7nd} unresolved dice).`);
                     return;
                   }
-                  let w = H0.hand.find((K) => K.id === lY[0]);
-                  if (w) yq(w);
+                  let v7c = lY.map((id) => H0.hand.find((K) => K.id === id)).filter(Boolean);
+                  if (v7c.length) yq(v7c[0], v7c.slice(1));
                 },
                 className: "h-[34px] rounded-xl bg-gradient-to-r from-rose-900 to-red-800 text-rose-100 font-cinzel font-bold text-xs border border-rose-400/60 cursor-pointer shadow-sm flex items-center justify-center gap-1.5",
-                children: [B(Oq, { className: "w-4 h-4" }), B("span", { children: "Discard 1 · Pass Turn" })],
+                children: [B(Oq, { className: "w-4 h-4" }), B("span", { children: `Discard ${O === "discard" ? 1 : Math.min(1 + KA.filter((d) => !d.used).length, H0.hand.length)} · Pass Turn` })],
               }),
             ],
           }),
@@ -14871,7 +14912,7 @@ R("footer", {
                     ? R("span", { className: "text-sm text-neutral-200 font-cinzel text-center", children: ["Ready for Turn ", H] })
                     : B("div", {
                         className: "w-full flex items-start justify-around",
-                        children: KA.map((w) => {
+                        children: [O === "action" && KA.some((d) => !d.used) && B("button", { onClick: v7rr, className: "px-2 h-7 rounded bg-amber-500 text-black text-xs font-black cursor-pointer self-center", children: "Roll rest" }), ...KA.map((w) => {
                           let K = iY.includes(w.id),
                             x = (w.value === 1 || w.value === 5) && !w.used;
                           return R(
@@ -14893,7 +14934,7 @@ R("footer", {
                             },
                             w.id,
                           );
-                        }),
+                        })],
                       }),
               }),
               R("div", {
@@ -15362,6 +15403,4 @@ Dq.createRoot(document.getElementById("root")).render(
   R(oA, { children: [B(vM, {}), B(yM, {})] }),
 );
 </script>
-
-
 </body></html>
