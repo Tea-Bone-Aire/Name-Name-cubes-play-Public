@@ -82,11 +82,11 @@
     var act = st.vals && st.vals.active, me = seat;
     var who = me === 'p1' ? 'You: Player 1' : me === 'p2' ? 'You: Player 2' : me === 'solo' ? 'Solo' : 'Pick a seat';
     var turn = act ? (me && act === me ? ' · YOUR TURN' : ' · ' + (act === 'p1' ? 'Player 1' : 'Player 2') + "'s turn") : '';
-    var full = who + turn + ' · ' + st.status + ' · build B11';
+    var full = who + turn + ' · ' + st.status + ' · build B12';
     if (st.status === 'connected') {
       var n = document.querySelector('[data-cc-code]'); if (n) n.remove();
       if (st.fullAt !== full) { st.fullAt = full; clearTimeout(st.fullT); st.fullT = setTimeout(function () { st.compact = true; render(); }, 4000); st.compact = false; }
-      banner.textContent = st.compact ? ((me && act === me ? '\u25CF YOUR TURN' : '\u25CB waiting') + ' · B11') : full;
+      banner.textContent = st.compact ? ((me && act === me ? '\u25CF YOUR TURN' : '\u25CB waiting') + ' · B12') : full;
     } else { st.fullAt = null; st.compact = false; banner.textContent = full; }
     banner.style.background = (me && act === me) ? '#14532d' : '#111';
   }
@@ -14348,7 +14348,7 @@ function fq({ onSwitchView: Y } = {}) {
           let j = T[G];
           return {
             ...T,
-            [G]: { ...j, hand: j.hand.filter((I) => I.id !== w.id && !v7ex.some((e) => e.id === I.id)) },
+            [G]: { ...j, hand: j.hand.filter((I) => I.id !== w.id && !v7ex.some((e) => e.id === I.id)), lanes: j.lanes.map((ln) => ({ ...ln, items: ln.items.map((it) => (it.playedThisTurn ? { ...it, playedThisTurn: !1 } : it)) })) },
           };
         }),
         c(`Discarded ${w.label}${MY[w.suit]}${v7ex.length ? " +" + v7ex.length + " more" : ""} to close turn.`),
