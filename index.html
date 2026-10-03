@@ -82,11 +82,11 @@
     var act = st.vals && st.vals.active, me = seat;
     var who = me === 'p1' ? 'You: Player 1' : me === 'p2' ? 'You: Player 2' : me === 'solo' ? 'Solo' : 'Pick a seat';
     var turn = act ? (me && act === me ? ' · YOUR TURN' : ' · ' + (act === 'p1' ? 'Player 1' : 'Player 2') + "'s turn") : '';
-    var full = who + turn + ' · ' + st.status + ' · build B13';
+    var full = who + turn + ' · ' + st.status + ' · build B14';
     if (st.status === 'connected') {
       var n = document.querySelector('[data-cc-code]'); if (n) n.remove();
       if (st.fullAt !== full) { st.fullAt = full; clearTimeout(st.fullT); st.fullT = setTimeout(function () { st.compact = true; render(); }, 4000); st.compact = false; }
-      banner.textContent = st.compact ? ((me && act === me ? '\u25CF YOUR TURN' : '\u25CB waiting') + ' · B13') : full;
+      banner.textContent = st.compact ? ((me && act === me ? '\u25CF YOUR TURN' : '\u25CB waiting') + ' · B14') : full;
     } else { st.fullAt = null; st.compact = false; banner.textContent = full; }
     banner.style.background = (me && act === me) ? '#14532d' : '#111';
   }
@@ -13385,42 +13385,14 @@ function v7bk(w, i, cap) {
   return v >= 1 && v <= cap ? v : "\u2013";
 }
 function v7tb(lane, w) {
-  let all = lane.items || [], rest = all.filter((v) => v.id !== w.id);
-  if (!all.some((v) => v.id === w.id) || lane.isBanked || !w.playedThisTurn) return { ok: !1 };
-  if (lane.laneType === "set" && all[all.length - 1].id !== w.id) return { ok: !1 };
-  if (rest.length < 3)
-    return all.every((v) => v.playedThisTurn) ? { ok: !0, pullAll: !0, rest: [] } : { ok: !1 };
-  let isW = (v) => v.source === "wild_2" || v.source === "joker",
-    N = rest.filter((v) => !isW(v)), Wd = rest.filter(isW);
-  if (Wd.length === 0 && N.length === 0) return { ok: !1 };
-  if (lane.laneType === "set") {
-    let r = N.length ? N[0].numericValue : null;
-    if (r !== null && N.some((v) => v.numericValue !== r)) return { ok: !1 };
-    return { ok: !0, rest: rest.map((v) => (isW(v) && r !== null ? { ...v, numericValue: r } : v)) };
-  }
-  let vals = N.map((v) => v.numericValue);
-  if (new Set(vals).size !== vals.length) return { ok: !1 };
-  let n = rest.length, minB = lane.laneCategory === "dice_pen" ? 1 : 3, maxB = lane.laneCategory === "dice_pen" ? 6 : 13;
-  if (!vals.length) return { ok: !1 };
-  let lo = Math.min(...vals), hi = Math.max(...vals), best = null;
-  for (let st = Math.max(minB, hi - n + 1); st <= Math.min(lo, maxB - n + 1); st++) {
-    let free = [];
-    for (let q = st; q < st + n; q++) if (!vals.includes(q)) free.push(q);
-    if (free.length !== Wd.length) continue;
-    let score = Wd.filter((v) => free.includes(v.numericValue)).length;
-    if (!best || score > best.score) best = { score, free };
-  }
-  if (!best) return { ok: !1 };
-  let free = [...best.free], out = new Map();
-  Wd.forEach((v) => { let i = free.indexOf(v.numericValue); if (i >= 0) { out.set(v.id, v.numericValue); free.splice(i, 1); } });
-  Wd.forEach((v) => { if (!out.has(v.id)) out.set(v.id, free.shift()); });
-  let res = rest.map((v) => {
-    if (!out.has(v.id)) return v;
-    let nv = out.get(v.id);
-    return { ...v, numericValue: nv, displayLabel: v.source === "wild_2" ? `\u26052(${KY(nv)})` : v.displayLabel };
-  });
-  res.sort((a, b) => a.numericValue - b.numericValue);
-  return { ok: !0, rest: res };
+  let all = lane.items || [], i = all.findIndex((v) => v.id === w.id);
+  if (i < 0 || lane.isBanked || !w.playedThisTurn) return { ok: !1 };
+  let n = all.length, leftN = i + 1, rightN = n - i,
+    remove = leftN < rightN ? all.slice(0, i + 1) : all.slice(i);
+  if (remove.length < 1 || n - remove.length < 3) remove = all;
+  if (!remove.every((v) => v.playedThisTurn)) return { ok: !1 };
+  let ids = new Set(remove.map((v) => v.id));
+  return { ok: !0, remove, rest: all.filter((v) => !ids.has(v.id)) };
 }
 function P6(Y) {
   if (Y.length === 0)
@@ -14161,7 +14133,7 @@ function fq({ onSwitchView: Y } = {}) {
       if (!x || x.isBanked) return;
       let v7r = v7tb(x, w);
       if (!v7r.ok) { c("❌ Taking that back would leave the lane illegal."); return; }
-      if (v7r.pullAll) { x.items.forEach((it) => (it.source === "die" ? hq(it, K, !0) : Eq(it, K, !0))); return; }
+      if (v7r.remove.length > 1) { v7r.remove.forEach((it) => (it.source === "die" ? hq(it, K, !0) : Eq(it, K, !0))); return; }
       let T = w.cardData || {
         id:
           w.originalRefId ||
@@ -14194,7 +14166,7 @@ function fq({ onSwitchView: Y } = {}) {
       if (!v7f) {
         let v7r = v7tb(x, w);
         if (!v7r.ok) { c("❌ Taking that back would leave the lane illegal."); return; }
-        if (v7r.pullAll) { x.items.forEach((it) => (it.source === "die" ? hq(it, K, !0) : Eq(it, K, !0))); return; }
+        if (v7r.remove.length > 1) { v7r.remove.forEach((it) => (it.source === "die" ? hq(it, K, !0) : Eq(it, K, !0))); return; }
       }
       (W((T) => {
         let j = T[G],
