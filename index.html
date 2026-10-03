@@ -82,7 +82,12 @@
     var act = st.vals && st.vals.active, me = seat;
     var who = me === 'p1' ? 'You: Player 1' : me === 'p2' ? 'You: Player 2' : me === 'solo' ? 'Solo' : 'Pick a seat';
     var turn = act ? (me && act === me ? ' · YOUR TURN' : ' · ' + (act === 'p1' ? 'Player 1' : 'Player 2') + "'s turn") : '';
-    banner.textContent = who + turn + ' · ' + st.status + ' · build B9';
+    var full = who + turn + ' · ' + st.status + ' · build B10';
+    if (st.status === 'connected') {
+      var n = document.querySelector('[data-cc-code]'); if (n) n.remove();
+      if (st.fullAt !== full) { st.fullAt = full; clearTimeout(st.fullT); st.fullT = setTimeout(function () { st.compact = true; render(); }, 4000); st.compact = false; }
+      banner.textContent = st.compact ? ((me && act === me ? '\u25CF YOUR TURN' : '\u25CB waiting') + ' · B10') : full;
+    } else { st.fullAt = null; st.compact = false; banner.textContent = full; }
     banner.style.background = (me && act === me) ? '#14532d' : '#111';
   }
   function showPicker() {
@@ -103,7 +108,7 @@
     [host, inp, join, solo].forEach(function (x) { picker.appendChild(x); });
     document.body.appendChild(picker);
   }
-  function showCode(code) { var n = document.createElement('div'); n.setAttribute('data-cc-ui','1'); n.style.cssText = 'pointer-events:none;position:fixed;bottom:8px;left:50%;transform:translateX(-50%);z-index:99999;background:#f5b301;color:#000;font:800 22px system-ui;padding:8px 18px;border-radius:12px;letter-spacing:4px'; n.textContent = 'CODE ' + code; document.body.appendChild(n); setTimeout(function () { n.style.opacity = '.55'; }, 15000); }
+  function showCode(code) { var n = document.createElement('div'); n.setAttribute('data-cc-ui','1'); n.setAttribute('data-cc-code','1'); n.style.cssText = 'pointer-events:none;position:fixed;bottom:8px;left:50%;transform:translateX(-50%);z-index:99999;background:#f5b301;color:#000;font:800 22px system-ui;padding:8px 18px;border-radius:12px;letter-spacing:4px'; n.textContent = 'CODE ' + code; document.body.appendChild(n); setTimeout(function () { n.style.opacity = '.55'; }, 15000); }
   var ALLOW = /^(Lanes|Pens|Opponent & Log|Deco|Obsidian|Felt)$/i;
   document.addEventListener('click', function (ev) {
     if (!seat || seat === 'w') { if (seat === 'w') {} }
