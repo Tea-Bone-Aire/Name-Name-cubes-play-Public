@@ -82,7 +82,7 @@
     var act = st.vals && st.vals.active, me = seat;
     var who = me === 'p1' ? 'You: Player 1' : me === 'p2' ? 'You: Player 2' : me === 'solo' ? 'Solo' : 'Pick a seat';
     var turn = act ? (me && act === me ? ' · YOUR TURN' : ' · ' + (act === 'p1' ? 'Player 1' : 'Player 2') + "'s turn") : '';
-    banner.textContent = who + turn + ' · ' + st.status + ' · build B8';
+    banner.textContent = who + turn + ' · ' + st.status + ' · build B9';
     banner.style.background = (me && act === me) ? '#14532d' : '#111';
   }
   function showPicker() {
@@ -14747,9 +14747,10 @@ B("div", {
                           iX = B("div", {
                             className: "grid grid-cols-11 gap-1.5 flex-1 min-h-0",
                             children: Array.from({ length: 11 }).map((R0, oY) => {
-                              let qY = w.items[oY];
+                              let v7sq = w.laneType === "sequence",
+                                qY = v7sq ? w.items.find((v) => v.numericValue === oY + 3) : w.items[oY];
                               if (!qY)
-                                return B("div", { className: "h-full rounded-lg border-2 border-dashed border-white/30 bg-black/30 flex items-center justify-center text-neutral-300 font-mono text-sm", children: v7bk(w, oY, 13) }, oY);
+                                return B("div", { className: "h-full rounded-lg border-2 border-dashed border-white/30 bg-black/30 flex items-center justify-center text-neutral-300 font-mono text-sm", children: v7sq || w.items.length === 0 ? KY(oY + 3) : v7bk(w, oY, 13) }, oY);
                               let UJ =
                                 !!qY.playedThisTurn && O === "action" && v7tb(w, qY).ok
                                   ? B("button", {
