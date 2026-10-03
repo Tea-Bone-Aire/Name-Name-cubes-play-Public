@@ -73,7 +73,7 @@
   function mk() {
     if (banner) return;
     banner = document.createElement('div'); banner.setAttribute('data-cc-banner','1');
-    banner.style.cssText = 'pointer-events:none;position:fixed;top:0;left:0;right:0;z-index:99999;font:600 12px system-ui,sans-serif;text-align:center;padding:4px 8px;background:#111;color:#f5b301;border-bottom:1px solid #444;pointer-events:none';
+    banner.style.cssText = 'pointer-events:none;position:fixed;bottom:0;left:0;max-width:62%;z-index:99999;font:600 11px system-ui,sans-serif;text-align:left;padding:2px 8px;background:#111d;color:#f5b301;border-top-right-radius:8px';
     document.body.appendChild(banner);
   }
   function setStatus(s) { st.status = s; render(); }
@@ -82,7 +82,7 @@
     var act = st.vals && st.vals.active, me = seat;
     var who = me === 'p1' ? 'You: Player 1' : me === 'p2' ? 'You: Player 2' : me === 'solo' ? 'Solo' : 'Pick a seat';
     var turn = act ? (me && act === me ? ' · YOUR TURN' : ' · ' + (act === 'p1' ? 'Player 1' : 'Player 2') + "'s turn") : '';
-    banner.textContent = who + turn + ' · ' + st.status + ' · build B3';
+    banner.textContent = who + turn + ' · ' + st.status + ' · build B4';
     banner.style.background = (me && act === me) ? '#14532d' : '#111';
   }
   function showPicker() {
