@@ -82,7 +82,7 @@
     var act = st.vals && st.vals.active, me = seat;
     var who = me === 'p1' ? 'You: Player 1' : me === 'p2' ? 'You: Player 2' : me === 'solo' ? 'Solo' : 'Pick a seat';
     var turn = act ? (me && act === me ? ' · YOUR TURN' : ' · ' + (act === 'p1' ? 'Player 1' : 'Player 2') + "'s turn") : '';
-    banner.textContent = who + turn + ' · ' + st.status + ' · build B6';
+    banner.textContent = who + turn + ' · ' + st.status + ' · build B7';
     banner.style.background = (me && act === me) ? '#14532d' : '#111';
   }
   function showPicker() {
@@ -14857,7 +14857,7 @@ R("footer", {
                   O === "draw" && H0.hand.length < 7 && B("button", { onClick: () => Iq(1), className: "px-2 h-[18px] rounded bg-amber-500 text-black font-bold text-xs cursor-pointer", children: "Draw" }),
                   O === "draw" && H0.hand.length < 6 && B("button", { onClick: () => Iq(7), className: "px-2 h-[18px] rounded bg-amber-500 text-black font-bold text-xs cursor-pointer", children: "Fill 7" }),
                   R("span", { className: "font-mono", children: ["Discard ", U.length] }),
-                  O === "draw" && H0.hand.length < 7 && U.length > 0 && cG(U[0]) && R("button", { onClick: Sq, title: `Take ${U[0].label}${MY[U[0].suit]}`, className: "px-2 h-[18px] rounded bg-neutral-800 text-amber-300 font-bold text-xs border border-amber-400/50 cursor-pointer", children: ["Take ", U[0].label] }),
+                  O === "draw" && H0.hand.length < 7 && U.length > 0 && cG(U[0]) && R("button", { onClick: Sq, title: `Take ${U[0].label}${MY[U[0].suit]}`, className: "px-2 h-[18px] rounded bg-neutral-200 text-neutral-900 font-bold text-xs border border-amber-400/50 cursor-pointer", children: ["Take ", U[0].label, R("span", { className: U[0].suit === "hearts" || U[0].suit === "diamonds" ? "text-red-600 text-sm ml-0.5" : "text-black text-sm ml-0.5", children: MY[U[0].suit] || "" })] }),
                 ],
               }),
               KA.length === 0
