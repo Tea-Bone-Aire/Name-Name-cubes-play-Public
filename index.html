@@ -137,6 +137,8 @@
         }
       }
     }
+    var dz = document.querySelectorAll('[data-cc-dice]');
+    for (var k = 0; k < dz.length; k++) { dz[k].style.filter = hide ? 'blur(14px)' : ''; dz[k].style.pointerEvents = hide ? 'none' : ''; }
     render();
   }
   setInterval(gate, 400);
@@ -14906,6 +14908,7 @@ R("footer", {
             className: "flex-1 min-w-0 flex gap-2",
             children: [
               B("div", {
+                "data-cc-dice": "1",
                 className: "w-[160px] shrink-0 flex items-center justify-center rounded-xl border border-white/30 bg-black/30 px-1",
                 children:
                   KA.length === 0
