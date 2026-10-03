@@ -82,11 +82,11 @@
     var act = st.vals && st.vals.active, me = seat;
     var who = me === 'p1' ? 'You: Player 1' : me === 'p2' ? 'You: Player 2' : me === 'solo' ? 'Solo' : 'Pick a seat';
     var turn = act ? (me && act === me ? ' · YOUR TURN' : ' · ' + (act === 'p1' ? 'Player 1' : 'Player 2') + "'s turn") : '';
-    var full = who + turn + ' · ' + st.status + ' · build B15';
+    var full = who + turn + ' · ' + st.status + ' · build B16';
     if (st.status === 'connected') {
       var n = document.querySelector('[data-cc-code]'); if (n) n.remove();
       if (st.fullAt !== full) { st.fullAt = full; clearTimeout(st.fullT); st.fullT = setTimeout(function () { st.compact = true; render(); }, 4000); st.compact = false; }
-      banner.textContent = st.compact ? ((me && act === me ? '\u25CF YOUR TURN' : '\u25CB waiting') + ' · B15') : full;
+      banner.textContent = st.compact ? ((me && act === me ? '\u25CF YOUR TURN' : '\u25CB waiting') + ' · B16') : full;
     } else { st.fullAt = null; st.compact = false; banner.textContent = full; }
     banner.style.background = (me && act === me) ? '#14532d' : '#111';
   }
@@ -14401,7 +14401,7 @@ function fq({ onSwitchView: Y } = {}) {
     v7ThemeOrder = ["art_deco", "obsidian_glass", "astral_felt"],
     v7FaceCls = (it) =>
       it.source === "wild_2"
-        ? "bg-white border-amber-500 text-amber-700"
+        ? "bg-cyan-100 border-cyan-600 text-cyan-800"
         : it.source === "joker"
           ? "bg-white border-purple-500 text-purple-700"
           : it.color === "red"
@@ -14873,7 +14873,7 @@ B("div", {
         ],
       }),
 R("footer", {
-        className: "h-[154px] shrink-0 border-t border-[var(--cockpit-border)] bg-[var(--cockpit-surface)] p-1.5 flex gap-2 z-20",
+        className: "h-[158px] shrink-0 border-t border-[var(--cockpit-border)] bg-[var(--cockpit-surface)] p-1.5 flex gap-2 z-20",
         children: [
           R("div", {
             className: "w-48 shrink-0 flex flex-col gap-1",
@@ -14887,10 +14887,10 @@ R("footer", {
             ],
           }),
           R("div", {
-            className: "h-[18px] flex items-center gap-1.5 text-xs text-neutral-200 px-0.5",
+            className: "h-[22px] flex items-center gap-1.5 text-xs text-neutral-200 px-0.5",
             children: [
                   R("span", { className: "font-mono", children: ["Discard ", U.length] }),
-                  U.length > 0 && R("span", { title: "Top of discard", className: "px-1.5 h-[18px] rounded bg-neutral-100 border border-amber-400/60 font-black text-sm flex items-center gap-0.5 leading-none " + (U[0].isJoker ? "text-purple-700" : U[0].isWild2 ? "text-amber-700" : (U[0].suit === "hearts" || U[0].suit === "diamonds") ? "text-red-600" : "text-neutral-900"), children: [U[0].isJoker ? "JKR" : U[0].label, U[0].isJoker ? "" : (MY[U[0].suit] || "")] }),
+                  U.length > 0 && R("span", { title: "Top of discard", className: "px-2 h-[22px] rounded bg-neutral-100 border-2 border-amber-400 font-black text-base flex items-center gap-0.5 leading-none " + (U[0].isJoker ? "text-purple-700" : U[0].isWild2 ? "text-cyan-800" : (U[0].suit === "hearts" || U[0].suit === "diamonds") ? "text-red-600" : "text-neutral-900"), children: [U[0].isJoker ? "JKR" : U[0].label, U[0].isJoker ? "" : U[0].isWild2 ? " WILD" : (MY[U[0].suit] || "")] }),
                   O === "draw" && H0.hand.length < 7 && U.length > 0 && cG(U[0]) && R("button", { onClick: Sq, title: `Take ${U[0].label}${MY[U[0].suit]}`, className: "px-2 h-[18px] rounded bg-neutral-200 text-neutral-900 font-bold text-xs border border-amber-400/50 cursor-pointer", children: ["Take ", U[0].label, R("span", { className: U[0].suit === "hearts" || U[0].suit === "diamonds" ? "text-red-600 text-sm ml-0.5" : "text-black text-sm ml-0.5", children: MY[U[0].suit] || "" })] }),
             ],
           }),
@@ -15003,17 +15003,17 @@ R("footer", {
                         x = w.color === "red",
                         T = w.isWild2,
                         j = w.isJoker,
-                        col = T ? "text-amber-700" : j ? "text-purple-700" : x ? "text-red-600" : "text-neutral-900";
+                        col = T ? "text-cyan-800" : j ? "text-purple-700" : x ? "text-red-600" : "text-neutral-900";
                       return R(
                         "div",
                         {
                           onClick: () => {
                             lX((I) => (I.includes(w.id) ? I.filter((X0) => X0 !== w.id) : [...I, w.id]));
                           },
-                          className: `flex-none w-[60px] h-[84px] ${v8i > 0 ? "-ml-5" : ""} rounded-lg border-2 bg-white shadow-md cursor-pointer select-none relative flex flex-col items-start pl-1.5 pt-1 transition-transform ${K ? "-translate-y-3 border-amber-400 ring-4 ring-amber-400 z-10" : T ? "border-amber-500" : j ? "border-purple-500" : "border-neutral-400"}`,
+                          className: `flex-none w-[60px] h-[84px] ${v8i > 0 ? "-ml-5" : ""} rounded-lg border-2 ${T ? "bg-cyan-100" : "bg-white"} shadow-md cursor-pointer select-none relative flex flex-col items-start pl-1.5 pt-1 transition-transform ${K ? "-translate-y-3 border-amber-400 ring-4 ring-amber-400 z-10" : T ? "border-cyan-600" : j ? "border-purple-500" : "border-neutral-400"}`,
                           children: [
                             j ? B(wq, { className: `text-2xl leading-none ${col}` }) : B("span", { className: `text-[22px] font-black leading-none ${col}`, children: w.label }),
-                            j ? null : B("span", { className: `text-xl leading-none ${col}`, children: MY[w.suit] }),
+                            j ? null : T ? B("span", { className: "text-[11px] font-black leading-none text-cyan-800 mt-0.5", children: "WILD" }) : B("span", { className: `text-xl leading-none ${col}`, children: MY[w.suit] }),
                           ],
                         },
                         w.id,
