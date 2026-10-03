@@ -82,7 +82,7 @@
     var act = st.vals && st.vals.active, me = seat;
     var who = me === 'p1' ? 'You: Player 1' : me === 'p2' ? 'You: Player 2' : me === 'solo' ? 'Solo' : 'Pick a seat';
     var turn = act ? (me && act === me ? ' · YOUR TURN' : ' · ' + (act === 'p1' ? 'Player 1' : 'Player 2') + "'s turn") : '';
-    banner.textContent = who + turn + ' · ' + st.status + ' · build B4';
+    banner.textContent = who + turn + ' · ' + st.status + ' · build B5';
     banner.style.background = (me && act === me) ? '#14532d' : '#111';
   }
   function showPicker() {
@@ -14071,7 +14071,7 @@ function fq({ onSwitchView: Y } = {}) {
             };
           }),
         ],
-        h = [...K.items, ...X0];
+        h = [...K.items, ...(j === "set" ? [...X0].sort((p, q2) => (window.__selOrd || []).indexOf(p.originalRefId) - (window.__selOrd || []).indexOf(q2.originalRefId)) : X0)];
       if (j === "sequence") h.sort((S, v) => S.numericValue - v.numericValue);
       if (
         (W((S) => {
@@ -14338,6 +14338,8 @@ function fq({ onSwitchView: Y } = {}) {
         eG(["Match reset. Player 1 goes first. Both players dealt 7 cards."]));
     },
     Y7 = x6(y6, v6, "clean", "primary");
+  { let selCur = [...lY, ...iY], selPrev = window.__selOrd || [];
+    window.__selOrd = selPrev.filter((id) => selCur.includes(id)).concat(selCur.filter((id) => !selPrev.includes(id))); }
   let [v7Sz, v7SetSz] = e.useState(() => [window.innerWidth, window.innerHeight, window.devicePixelRatio || 1]);
   e.useEffect(() => {
     let f = () => v7SetSz([window.innerWidth, window.innerHeight, window.devicePixelRatio || 1]);
