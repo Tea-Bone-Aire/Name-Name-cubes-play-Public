@@ -82,11 +82,11 @@
     var act = st.vals && st.vals.active, me = seat;
     var who = me === 'p1' ? 'You: Player 1' : me === 'p2' ? 'You: Player 2' : me === 'solo' ? 'Solo' : 'Pick a seat';
     var turn = act ? (me && act === me ? ' · YOUR TURN' : ' · ' + (act === 'p1' ? 'Player 1' : 'Player 2') + "'s turn") : '';
-    var full = who + turn + ' · ' + st.status + ' · build B10';
+    var full = who + turn + ' · ' + st.status + ' · build B11';
     if (st.status === 'connected') {
       var n = document.querySelector('[data-cc-code]'); if (n) n.remove();
       if (st.fullAt !== full) { st.fullAt = full; clearTimeout(st.fullT); st.fullT = setTimeout(function () { st.compact = true; render(); }, 4000); st.compact = false; }
-      banner.textContent = st.compact ? ((me && act === me ? '\u25CF YOUR TURN' : '\u25CB waiting') + ' · B10') : full;
+      banner.textContent = st.compact ? ((me && act === me ? '\u25CF YOUR TURN' : '\u25CB waiting') + ' · B11') : full;
     } else { st.fullAt = null; st.compact = false; banner.textContent = full; }
     banner.style.background = (me && act === me) ? '#14532d' : '#111';
   }
@@ -13865,6 +13865,8 @@ function fq({ onSwitchView: Y } = {}) {
     },
     Iq = (v7want) => {
       if (O !== "draw") return;
+      if (window.__v7dc) return;
+      window.__v7dc = 1; setTimeout(() => (window.__v7dc = 0), 500);
       let v7n = Math.min(v7want || 1, 7 - H0.hand.length);
       if (v7n <= 0) { L("roll"); return; }
       let w = [...X];
@@ -13872,7 +13874,7 @@ function fq({ onSwitchView: Y } = {}) {
       let K = w.slice(0, v7n),
         x = w.slice(v7n);
       (Z(x),
-        W((T) => ({ ...T, [G]: { ...T[G], hand: [...T[G].hand, ...K] } })),
+        W((T) => ({ ...T, [G]: { ...T[G], hand: [...T[G].hand, ...K].slice(0, 7) } })),
         c(`Drew ${v7n} card(s): ${K.map((T) => `${T.label}${MY[T.suit]}`).join(", ")}.`),
         H0.hand.length + v7n >= 7 && L("roll"));
     },
@@ -13880,6 +13882,8 @@ function fq({ onSwitchView: Y } = {}) {
       if (U.length === 0) return;
       if (O !== "draw") { c("Draw from the discard only in the draw step."); return; }
       if (H0.hand.length >= 7) { c("Hand is full (7). Cannot draw."); return; }
+      if (window.__v7dc) return;
+      window.__v7dc = 1; setTimeout(() => (window.__v7dc = 0), 500);
       if (window.__v7dt) { c("Only one discard card per draw."); return; }
       window.__v7dt = !0;
       let w = U[0];
@@ -13890,7 +13894,7 @@ function fq({ onSwitchView: Y } = {}) {
         return;
       }
       (z((K) => K.slice(1)),
-        W((K) => ({ ...K, [G]: { ...K[G], hand: [...K[G].hand, w] } })),
+        W((K) => (K[G].hand.length >= 7 ? K : { ...K, [G]: { ...K[G], hand: [...K[G].hand, w] } })),
         c(`Took top discard: ${w.label}${MY[w.suit]}.`),
         H0.hand.length + 1 >= 7 && L("roll"));
     },
